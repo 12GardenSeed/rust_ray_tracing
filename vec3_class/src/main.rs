@@ -1,7 +1,7 @@
 use std::io;
 use std::{fs, env};
 
-pub struct Vec3H {
+struct Vec3H {
     values:Vec<f64>,
 }
 
@@ -38,10 +38,58 @@ impl std::ops::AddAssign for Vec3H {
     }
 }
 
-impl std::ops::Index for Vec3H {
+impl std::ops::Index<usize> for Vec3H {
     type Output = f64;
-    fn index(index: usize<0..3>) -> &self::Output {
+    fn index(&self,index: usize) -> &Self::Output {
+        match index {
+            x if x >= 0 && x <= 2 => { &self.values[x] }
+            _ => {panic!("try index vec3 index more than 2" );}
+        }
     } 
+}
+
+impl std::ops::IndexMut<usize> for Vec3H {
+    fn index_mut(&mut self, index:usize) -> &mut f64 {
+        match index {
+            x if x >= 0 && x <= 2 => { &mut self.values[x] }
+            _ => {panic!("try mut index vec3 index more than 2" );}
+        }
+    }
+}
+
+impl std::ops::Mul<f64> for Vec3H {
+    type Output = Vec3H;
+    fn mul(self, _rsh: f64) -> Self::Output {
+        Vec3H{
+            values:vec![
+                self.x() * _rsh,
+                self.y() * _rsh,
+                self.z() * _rsh,
+            ]
+        }
+    }
+}
+
+impl std::ops::MulAssign<f64> for Vec3H {
+    fn mul_assign(&mut self, _rsh:f64) {
+        self[0] = self[0] * _rsh;
+        self[1] = self[1] * _rsh;
+        self[2] = self[2] * _rsh
+    }
+}
+
+
+impl std::ops::Div<f64> for Vec3H {
+    type Output = Vec3H;
+    fn div(self, _rsh) -> Self::Output {
+        Vec3H {
+            values:vec![
+                self[0] / _rsh,
+                self[1] / _rsh,
+                self[2] / _rsh
+            ]
+        }
+    }
 }
 
 fn main() {
