@@ -1,13 +1,21 @@
 use std::io;
 use std::{fs, env};
 
-struct Vec3H {
+#[derive(Clone)]
+pub struct Vec3H {
     values:Vec<f64>,
 }
 
 impl Vec3H {
     fn x(&self) -> f64 {
         self.values[0]
+    }
+
+    #[inline]
+    fn new(x: f64, y:f64, z:f64) -> Self {
+        Vec3H {
+            values: vec![x,y,z]
+        }
     }
 
     fn y(&self) -> f64 {
@@ -25,10 +33,15 @@ impl Vec3H {
     fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
+
+    fn unit_vec3(&self) -> Vec3H {
+        self.clone() / self.length()
+    }
 }
 
 impl std::ops::Add<Vec3H> for Vec3H {
     type Output = Vec3H;
+    #[inline]
     fn add(self, _rhs: Vec3H) -> Vec3H {
         let mut v = vec![];
         v.push(self.x() + _rhs.x());
@@ -88,7 +101,6 @@ impl std::ops::MulAssign<f64> for Vec3H {
     }
 }
 
-
 impl std::ops::Div<f64> for Vec3H {
     type Output = Vec3H;
     fn div(self, _rsh: f64) -> Self::Output {
@@ -114,13 +126,20 @@ impl std::fmt::Display for Vec3H {
     }
 }
 
+pub fn cross(u: &Vec3H, v: &Vec3H) -> Vec3H {
+    Vec3H::new(
+        u[1] * v[2] - u[2] - v[1],
+        u[2] * v[0] - u[0] - v[2],
+        u[0] * v[1] - u[1] - v[0]
+    )
+}
+
+pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
+    u[0] * v[0] + u[1] * v[1] + u[2] * v[2]
+}
+
 type Color = Vec3H;
 type Point3 = Vec3H;
 
 fn main() {
-    let a = Color {
-        values:vec![0f64,0.1,0.1]
-    };
-    println!("{}  haha \n{}", a, a)
 }
-
