@@ -1,145 +1,26 @@
-use std::io;
+mod vec3;
+use vec3::{Color, Point3, write_color};
 use std::{fs, env};
-
-#[derive(Clone)]
-pub struct Vec3H {
-    values:Vec<f64>,
-}
-
-impl Vec3H {
-    fn x(&self) -> f64 {
-        self.values[0]
-    }
-
-    #[inline]
-    fn new(x: f64, y:f64, z:f64) -> Self {
-        Vec3H {
-            values: vec![x,y,z]
-        }
-    }
-
-    fn y(&self) -> f64 {
-        self.values[1]
-    }
-
-    fn z(&self) -> f64 {
-        self.values[2]
-    }
-
-    fn length_squared(&self) -> f64 {
-        self[0] * self[0] + self[1] * self[1] + self[2] * self[2]  
-    }
-
-    fn length(&self) -> f64 {
-        self.length_squared().sqrt()
-    }
-
-    fn unit_vec3(&self) -> Vec3H {
-        self.clone() / self.length()
-    }
-}
-
-impl std::ops::Add<Vec3H> for Vec3H {
-    type Output = Vec3H;
-    #[inline]
-    fn add(self, _rhs: Vec3H) -> Vec3H {
-        let mut v = vec![];
-        v.push(self.x() + _rhs.x());
-        v.push(self.y() + _rhs.y());
-        v.push(self.z() + _rhs.z());
-        Vec3H {
-            values:v
-        }
-    }
-}
-
-impl std::ops::AddAssign for Vec3H {
-    fn add_assign(&mut self, _rhs: Vec3H) {
-        self.values[0] = self.x() + _rhs.x();
-        self.values[1] = self.y() + _rhs.y();
-        self.values[2] = self.z() + _rhs.z();
-    }
-}
-
-impl std::ops::Index<usize> for Vec3H {
-    type Output = f64;
-    fn index(&self,index: usize) -> &Self::Output {
-        match index {
-            x if x >= 0 && x <= 2 => { &self.values[x] }
-            _ => {panic!("try index vec3 index more than 2" );}
-        }
-    } 
-}
-
-impl std::ops::IndexMut<usize> for Vec3H {
-    fn index_mut(&mut self, index:usize) -> &mut f64 {
-        match index {
-            x if x >= 0 && x <= 2 => { &mut self.values[x] }
-            _ => {panic!("try mut index vec3 index more than 2" );}
-        }
-    }
-}
-
-impl std::ops::Mul<f64> for Vec3H {
-    type Output = Vec3H;
-    fn mul(self, _rsh: f64) -> Self::Output {
-        Vec3H{
-            values:vec![
-                self.x() * _rsh,
-                self.y() * _rsh,
-                self.z() * _rsh,
-            ]
-        }
-    }
-}
-
-impl std::ops::MulAssign<f64> for Vec3H {
-    fn mul_assign(&mut self, _rsh:f64) {
-        self[0] = self[0] * _rsh;
-        self[1] = self[1] * _rsh;
-        self[2] = self[2] * _rsh
-    }
-}
-
-impl std::ops::Div<f64> for Vec3H {
-    type Output = Vec3H;
-    fn div(self, _rsh: f64) -> Self::Output {
-        Vec3H {
-            values:vec![
-                self[0] / _rsh,
-                self[1] / _rsh,
-                self[2] / _rsh
-            ]
-        }
-    }
-}
-
-impl std::ops::DivAssign<f64> for Vec3H {
-    fn div_assign(&mut self, _rsh: f64) {
-        self.values = self.values.iter().map(|&x| x /  _rsh).collect::<Vec<f64>>()
-    }
-}
-
-impl std::fmt::Display for Vec3H {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Vec3H -> x:{} y:{} z:{}", self[0], self[1], self[2])
-    }
-}
-
-pub fn cross(u: &Vec3H, v: &Vec3H) -> Vec3H {
-    Vec3H::new(
-        u[1] * v[2] - u[2] - v[1],
-        u[2] * v[0] - u[0] - v[2],
-        u[0] * v[1] - u[1] - v[0]
-    )
-}
-
-pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
-    u[0] * v[0] + u[1] * v[1] + u[2] * v[2]
-}
-
-type Color = Vec3H;
-type Point3 = Vec3H;
-
+use std::io;
+static image_width:i32 = 256i32;
+static image_height:i32 = 256;
 fn main() {
+    let mut current_dir = env::current_dir().unwrap();
+    current_dir.push("test.ppm");
+    let mut ss = format!("P3\n{} {} \n255\n", image_width, image_height);
+    println!("{:?}", current_dir);
+    for i in 0..image_width as usize {
+        for j in 0..image_height as usize {
+            let r = i as f32 / (image_width - 1) as f32;
+            let g = 0.25;
+            let b = j as f32 / (image_height - 1) as f32;
+            let ir = (255.999 * r ) as i32;
+            let ig = (255.999 * g ) as i32;
+            let ib = (255.999 * b ) as i32;
+            let ss2 = format!("{} \n", write_color(Color::new(i as f64 / (image_width - 1) as f64, 0.25, j as f64 / (image_height - 1) as f64)));
+            ss.push_str(&ss2);
+            // fs::write(current_dir.to_owned(), ss).unwrap();
+        }
+    }
+    fs::write(current_dir.to_owned(), ss).unwrap();
 }
