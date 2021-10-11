@@ -59,6 +59,21 @@ impl std::ops::Add<Vec3H> for Vec3H {
     }
 }
 
+impl std::ops::Sub<Vec3H> for Vec3H {
+    type Output = Vec3H;
+    #[inline]
+    fn sub(self, _rhs: Vec3H) -> Vec3H {
+        let mut v = vec![];
+        v.push(self.x() - _rhs.x());
+        v.push(self.y() - _rhs.y());
+        v.push(self.z() - _rhs.z());
+        Vec3H {
+            values:v
+        }
+    }
+}
+
+
 impl std::ops::AddAssign for Vec3H {
     #[inline]
     fn add_assign(&mut self, _rhs: Vec3H) {

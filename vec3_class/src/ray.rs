@@ -1,10 +1,10 @@
-mod vec3h;
+// mod vec3;
 use std::io;
-use crate::vec3h::Vec3H;
+use crate::vec3::Vec3H;
 
 pub struct Ray {
-    direction: Vec3H,
-    origin: Vec3H
+    pub direction: Vec3H,
+    pub origin: Vec3H
 }
 
 impl Ray {
