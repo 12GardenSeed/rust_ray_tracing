@@ -34,6 +34,9 @@ fn ray_color(ray:&Ray) -> Color {
     let t = (unit.y() + 1.0) * 0.5;
    Color::new(1.0, 1.0, 1.0) *  (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
+fn hit_sphere(center: &Point3, redius:&f64, r: &Ray) -> bool {
+    let
+}
 
 fn main() {
     let IMAGE_HEIGHT:i32 = f64::floor((IMAGE_WIDTH as f64 /ASPECT_RATIO)) as i32;
@@ -54,17 +57,21 @@ fn main() {
     let left_lower_corner =  camera.clone() - horizontal.clone() / 2.0 - vertical.clone() / 2.0 - Point3::new(0.0, 0.0, 1.0);
 
     let mut ss = String::new();
-    for i in 0..IMAGE_WIDTH as usize {
-        for j in 0..IMAGE_HEIGHT as usize {
-            let u = i as f64 / IMAGE_WIDTH as f64;
-            let v = j as f64 / IMAGE_HEIGHT as f64;
+    let mut ss = format!("P3\n{} {} \n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+    for j in 0..IMAGE_HEIGHT as usize {
+        for i in 0..IMAGE_WIDTH as usize {
+            let j = IMAGE_HEIGHT as usize - j - 1;
+            let u = i as f64 / (IMAGE_WIDTH - 1) as f64;
+            let v = j as f64 / (IMAGE_HEIGHT - 1) as f64;
             let ray = Ray::new(
                 &camera, 
                 &(left_lower_corner.clone() + horizontal.clone() * u +  vertical.clone() * v)
             );
-            let ss2 = format!("{} \n", write_color(ray_color(&ray)));
+            let ss2 = format!("{}\n", write_color(ray_color(&ray)));
+            if i == 0 {
+                println!("{} {}", ray.direction.y(), &ss2)
+            }
             ss.push_str(&ss2);
-            // fs::write(current_dir.to_owned(), ss).unwrap();
         }
     }
     fs::write(current_dir.to_owned(), ss).unwrap();
