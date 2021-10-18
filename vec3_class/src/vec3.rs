@@ -98,7 +98,7 @@ impl std::ops::IndexMut<usize> for Vec3H {
     #[inline]
     fn index_mut(&mut self, index:usize) -> &mut f64 {
         match index {
-            x if x >= 0 && x <= 2 => { &mut self.values[x] }
+            x if x <= 2 => { &mut self.values[x] }
             _ => {panic!("try mut index vec3 index more than 2" );}
         }
     }
