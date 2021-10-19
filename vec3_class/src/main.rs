@@ -1,11 +1,12 @@
 mod vec3;
 mod ray;
+mod hitable;
 use vec3::{Color, Point3, Vec3H, write_color, dot};
 use std::{fs, env};
 use ray::Ray;
 // use std::io;
 static IMAGE_WIDTH:i32 = 256i32;
-static ASPECT_RATIO:f64 = 1.0;
+static ASPECT_RATIO:f64 = 16.0 / 9.0;
 static FILE_NAME:&str = "ray.ppm";
 fn main_1() {
     let IMAGE_HEIGHT = 256;
@@ -30,20 +31,25 @@ fn main_1() {
 }
 
 fn ray_color(ray:&Ray) -> Color {
-    if hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray) {
-        return Color::new(1.0, 0.0, 1.0)
+    let t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray);
+    if t >= 0.0 {
+        let normal = (ray.at(t) - Point3::new(0.0,0.0, -1.0)).unit_vec3();
+        return Color::new(normal.x() + 1.0, normal.y() + 1.0,normal.z() + 1.0) * 0.5
     }
     let unit = ray.direction.clone().unit_vec3();
     let t = (unit.y() + 1.0) * 0.5;
     Color::new(1.0, 1.0, 1.0) *  (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
-fn hit_sphere(center: &Point3, redius: f64, r: &Ray) -> bool {
+fn hit_sphere(center: &Point3, redius: f64, r: &Ray) -> f64 {
     let a = dot(&r.direction, &r.direction);
-    let b = 2.0 * dot(&r.direction, &(r.origin.clone() - center.clone()));
+    let half_b = dot(&r.direction, &(r.origin.clone() - center.clone()));
     let c = dot(&(r.origin.clone() - center.clone()), &(r.origin.clone() - center.clone())) - redius * redius;
-    let delta = b * b - 4.0 * a * c;
-    delta >= 0.0
+    let delta = half_b * half_b - a * c;
+    if delta < 0.0 {
+        return -1.0
+    }
+    (-half_b - delta.sqrt()) / a
 }
 
 fn main() {
@@ -55,8 +61,8 @@ fn main() {
     current_dir.push(FILE_NAME);
 
     // Image
-    let horizontal = Vec3H::new(2.0 / ASPECT_RATIO, 0.0, 0.0);
-    let vertical = Vec3H::new(0.0, 2.0, 0.0);
+    let horizontal = Vec3H::new(2.0 * ASPECT_RATIO , 0.0, 0.0);
+    let vertical = Vec3H::new(0.0, 2.0 , 0.0);
     let left_lower_corner =  camera.clone() - horizontal.clone() / 2.0 - vertical.clone() / 2.0 - Point3::new(0.0, 0.0, 1.0);
 
     let mut ss = String::new();

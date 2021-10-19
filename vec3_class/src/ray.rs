@@ -1,5 +1,4 @@
 // mod vec3;
-use std::io;
 use crate::vec3::Vec3H;
 
 pub struct Ray {
@@ -13,5 +12,9 @@ impl Ray {
             origin :origin.clone(),
             direction: direction.clone()
         }
+    }
+
+    pub fn at(&self, t: f64) -> Vec3H {
+        self.origin.clone() + self.direction.clone() * t
     }
 }

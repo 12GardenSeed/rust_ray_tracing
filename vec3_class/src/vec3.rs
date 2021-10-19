@@ -168,6 +168,9 @@ pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
 }
 
 fn to_255(f: f64) -> i32 {
+    if f > 1.0 {
+        return 255
+    }
     (255.999 * f) as i32
 }
 
