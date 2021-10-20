@@ -88,7 +88,7 @@ impl std::ops::Index<usize> for Vec3H {
     #[inline]
     fn index(&self,index: usize) -> &Self::Output {
         match index {
-            x if x >= 0 && x <= 2 => { &self.values[x] }
+            x if x <= 2 => { &self.values[x] }
             _ => {panic!("try index vec3 index more than 2" );}
         }
     } 
