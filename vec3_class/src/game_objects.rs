@@ -46,12 +46,18 @@ impl hitable for Sphere {
         let half_b = dot(&ray.direction, &(ray.origin.clone() - self.center.clone()));
         let c = dot(&(ray.origin.clone() - self.center.clone()), &(ray.origin.clone() - self.center.clone())) - self.radius * self.radius;
         let delta = half_b * half_b - a * c;
-        if delta < 0.0 {
+        let res =  (- half_b + delta.sqrt()) / a; 
+        if delta < 0.0 || res < t_min || res > t_max {
             return -1.0
         }
-        let res =  (- half_b + delta) / a; 
+
+        // println!("debug hittable {} {} {} {} {}",a,half_b,c,delta,res);
+        // println!("VECS: oo1 {}", ray.origin.clone() - self.center.clone());
         let p = ray.at(res);
-        let normal = (p.clone() - self.center.clone()).unit_vec3();
+        let mut normal = (p.clone() - self.center.clone()).unit_vec3();
+        if dot( &normal, &ray.direction) < 0.0  {
+            normal = normal * -1.0
+        }
         hit_record.point = Some(p);
         hit_record.normal = Some(normal);
         hit_record.t = Some(delta);
