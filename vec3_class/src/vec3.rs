@@ -1,7 +1,7 @@
 
 use std::{fs, env};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Vec3H {
     values:Vec<f64>,
 }
