@@ -1,6 +1,5 @@
-
 use std::{fs, env};
-
+use crate::utility::Utility;
 #[derive(Clone, Debug)]
 pub struct Vec3H {
     values:Vec<f64>,
@@ -165,6 +164,20 @@ pub fn cross(u: &Vec3H, v: &Vec3H) -> Vec3H {
 
 pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
     u[0] * v[0] + u[1] * v[1] + u[2] * v[2]
+}
+
+#[inline]
+pub fn random() -> Vec3H {
+    Vec3H::new(Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0))
+}
+
+pub fn random_in_unit_sphere() -> Vec3H {
+    loop {
+        let r = random();
+        if r.length() < 1.0 {
+            return r
+        }
+    }
 }
 
 fn to_255(f: f64) -> i32 {
