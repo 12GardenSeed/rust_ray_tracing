@@ -15,8 +15,8 @@ use crate::camera::Camera;
 // use std::io;
 static FILE_NAME:&str = "ray.ppm";
 static RADIUS_PIEXL: usize = 1;
-static SAMPLING_COUNT: usize = 2;
-static MAX_DEPTH:usize = 5;
+static SAMPLING_COUNT: usize = 99;
+static MAX_DEPTH:usize = 50;
 
 fn clamp(x: f64, min: f64, max: f64) -> f64 {
     assert!(min < max);
@@ -32,7 +32,7 @@ fn clamp_i32(x: i32, min: i32, max: i32) -> usize {
     x as usize
 }
 
-fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize, is_deug_area: bool) -> Color {
+fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> Color {
     if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
@@ -44,14 +44,9 @@ fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize, is_
         let normal = hit_record.normal.unwrap_or(Vec3H::new(0.0, 0.0, 0.0));
         let hit_point = hit_record.point.unwrap_or(Vec3H::new(0.0, 0.0, 0.0));
         if t > 0.0 {
-            // println!("{}", random_in_unit_sphere());
-            let target = hit_point.clone() + normal.clone();
-            let res = ray_color(&Ray::new(&hit_point, &(target - hit_point.clone())), objects, depth - 1, is_deug_area) * 0.5;
-            if is_deug_area {
-                println!("hit_point: {} -- normal: {} -- dep:{},v:{}", hit_point, normal, depth, i)
-            }
-            return res
-            // return Color::new(normal.x() + 1.0, normal.y() + 1.0,normal.z() + 1.0) * 0.5
+            let target = hit_point.clone() + normal.clone() + random_in_unit_sphere();
+            assert!(!v.is_in_object(&target));
+            return ray_color(&Ray::new(&hit_point, &(target.clone() - hit_point.clone())), objects, depth - 1) * 0.5;
         }
         i += 1;
     }
@@ -113,27 +108,15 @@ fn main() {
         for i in 0..camera.image_width as usize {
             let mut sum_vec = Vec3H::new(0.0, 0.0, 0.0);
             for t in 0..SAMPLING_COUNT {
-                let is_deug_area = i > 165 && i < 239 && j <= 140 && j > 110;
                 let j = IMAGE_HEIGHT as usize - j- 1;
-                let add_x = 0; // t % 3;
-                let add_y = 0; //(t / 3) % 3; 
+                let add_x = t % 3;
+                let add_y = (t / 3) % 3; 
                 let rand_x = add_x + i;//(Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + i;
                 let rand_y = add_y + j;//(Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + j;
-                // let rand_y = IMAGE_HEIGHT as usize - rand_y - 1;
-                // println!("x: {} -> {} {}\ny:{} -> {} {}",i, rand_x, rand_x as i32 - i as i32, IMAGE_HEIGHT as usize - j - 1, rand_y,rand_y as i32 - (IMAGE_HEIGHT as usize - j - 1) as i32);
-                
                 let u = clamp_i32(rand_x as i32, 0 , camera.image_width - 1) as f64 / (camera.image_width - 1) as f64;
                 let v = clamp_i32(rand_y as i32, 0 , IMAGE_HEIGHT - 1) as f64 / (IMAGE_HEIGHT - 1) as f64;
                 let ray = camera.get_ray(u, v);
-                let mut add = ray_color(&ray, &objects, MAX_DEPTH, is_deug_area);
-                // 165 70 -> 239 111
-                if is_deug_area {
-                    let mut g = String::from("");
-                    if add.length() > 0.3 {
-                        g = String::from("dark")
-                    }
-                    println!("{} : {} {} [{} {}]", g, t, add, i, j)
-                }
+                let mut add = ray_color(&ray, &objects, MAX_DEPTH);
                 sum_vec += add / SAMPLING_COUNT as f64;
             }
             let ss2 = format!("{}\n", write_color(sum_vec));
