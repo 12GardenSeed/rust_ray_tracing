@@ -1,5 +1,5 @@
 use std::{fs, env};
-use crate::utility::Utility;
+use crate::utility::utility;
 #[derive(Clone, Debug)]
 pub struct Vec3H {
     values:Vec<f64>,
@@ -168,7 +168,7 @@ pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
 
 #[inline]
 pub fn random() -> Vec3H {
-    Vec3H::new(Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0))
+    Vec3H::new(utility::get_random_range_f64(-1.0, 1.0), utility::get_random_range_f64(-1.0, 1.0), utility::get_random_range_f64(-1.0, 1.0))
 }
 
 pub fn random_in_unit_sphere() -> Vec3H {
@@ -180,6 +180,7 @@ pub fn random_in_unit_sphere() -> Vec3H {
     }
 }
 
+
 fn to_255(f: f64) -> i32 {
     if f > 1.0 {
         return 255
@@ -188,7 +189,8 @@ fn to_255(f: f64) -> i32 {
 }
 
 pub fn write_color(c: Color) -> String {
-    format!("{} {} {}", to_255(c[0]), to_255(c[1]), to_255(c[2]))
+    let cc = Vec3H::new(c[0] * c[0],c[1] * c[1], c[2] * c[2]);
+    format!("{} {} {}", to_255(cc[0]), to_255(cc[1]), to_255(cc[2]))
 }
 
 pub type Color = Vec3H;

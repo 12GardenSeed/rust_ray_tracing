@@ -8,7 +8,7 @@ use game_objects::{GameObject, GameObjectTrait, Sphere};
 use hitable::HitRecord;
 use vec3::{Color, Point3, Vec3H, write_color, dot, random_in_unit_sphere};
 use std::{env, fs, rc::Rc};
-use crate::utility::Utility;
+// use crate::utility::utility;
 use ray::Ray;
 
 use crate::camera::Camera;
@@ -32,6 +32,10 @@ fn clamp_i32(x: i32, min: i32, max: i32) -> usize {
     x as usize
 }
 
+fn unit_random_sphere() -> Vec3H {
+    random_in_unit_sphere().unit_vec3()
+}
+
 fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> Color {
     if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
@@ -40,11 +44,11 @@ fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> 
     for v in  objects {
         let game_obj = v.as_ref();
         let mut hit_record = HitRecord::new_default();
-        let t = game_obj.hit(&mut hit_record, &ray, 0.0, 99999.0);
+        let t = game_obj.hit(&mut hit_record, &ray, 0.001, 99999.0);
         let normal = hit_record.normal.unwrap_or(Vec3H::new(0.0, 0.0, 0.0));
         let hit_point = hit_record.point.unwrap_or(Vec3H::new(0.0, 0.0, 0.0));
         if t > 0.0 {
-            let target = hit_point.clone() + normal.clone() + random_in_unit_sphere();
+            let target = hit_point.clone() + normal.clone() + unit_random_sphere();
             assert!(!v.is_in_object(&target));
             return ray_color(&Ray::new(&hit_point, &(target.clone() - hit_point.clone())), objects, depth - 1) * 0.5;
         }

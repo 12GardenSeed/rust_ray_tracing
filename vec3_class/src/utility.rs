@@ -1,7 +1,7 @@
 extern crate rand;
 use rand::Rng;
 
-pub mod Utility {
+pub mod utility {
     use rand::Rng;
 
     #[inline]
