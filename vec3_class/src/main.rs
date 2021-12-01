@@ -4,6 +4,7 @@ mod hitable;
 mod game_objects;
 mod utility;
 mod camera;
+mod material;
 use game_objects::{GameObject, GameObjectTrait, Sphere};
 use hitable::HitRecord;
 use vec3::{Color, Point3, Vec3H, write_color, dot, random_in_unit_sphere};
