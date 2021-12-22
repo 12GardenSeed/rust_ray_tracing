@@ -1,12 +1,12 @@
 use std::rc::Rc;
 
-use crate::hitable::{HitRecord, hitable};
+use crate::hitable::{HitRecord, Hitable};
 use crate::{Point3, dot};
 pub trait Component {
     fn get_name(&mut self) -> String;
 }
 
-pub trait GameObjectTrait:hitable {
+pub trait GameObjectTrait:Hitable {
     fn is_game_object(&mut self) -> bool {
         true
     }
@@ -42,7 +42,7 @@ impl Sphere {
     }
 }
 
-impl hitable for Sphere {
+impl Hitable for Sphere {
     fn hit(&self, hit_record:&mut HitRecord, ray: &crate::ray::Ray, t_min: f64, t_max: f64) -> f64 {
         let a = dot(&ray.direction, &ray.direction);
         let half_b = dot(&ray.direction, &(ray.origin.clone() - self.center.clone()));
