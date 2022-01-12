@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use crate::hitable::{HitRecord, Hitable};
+use crate::material::Material;
 use crate::{Point3, dot};
 pub trait Component {
     fn get_name(&mut self) -> String;
@@ -12,10 +13,11 @@ pub trait GameObjectTrait:Hitable {
     }
     fn is_in_object(&self, p: &Point3) -> bool;
     fn distance(&self, p: &Point3) -> f64;
+    fn bind_material(&mut self, material: Rc<dyn Material>);
 }
 
 pub struct GameObject {
-    components: Vec<Rc<dyn Component>>,
+    components: Vec<Box<dyn Component>>,
 }
 
 impl GameObject {
@@ -27,17 +29,17 @@ impl GameObject {
 }
 
 pub struct Sphere {
-    game_object:GameObject,
     center: Point3,
     radius: f64,
+    material: Option<Rc<dyn Material>>,
 }
 
 impl Sphere {
-    pub fn new(center:Point3, radius:f64) -> Sphere {
+    pub fn new(center:Point3, radius:f64, material: Option<Rc<dyn Material>>) -> Sphere {
         Sphere {
-            game_object:GameObject::new(),
             center:center,
-            radius:radius
+            radius:radius,
+            material,
         }
     }
 }
@@ -72,5 +74,13 @@ impl GameObjectTrait for Sphere {
     fn distance(&self, p: &Point3) -> f64 {
         let v = p.clone() - self.center.clone();
         v.length() - self.radius
+    }
+
+    fn is_game_object(&mut self) -> bool {
+        true
+    }
+
+    fn bind_material(&mut self, material:Rc<dyn Material>) {
+        self.material = Some(material)
     }
 }

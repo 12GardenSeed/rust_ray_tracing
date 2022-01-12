@@ -65,12 +65,12 @@ fn main() {
     let mut objects = Vec::<Rc<dyn GameObjectTrait>>::new();
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)
+            Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, None)
         )
     );
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(0.0, -100.5, - camera.distance), 100.0)
+            Sphere::new(Point3::new(0.0, -100.5, - camera.distance), 100.0, None)
         )
     );
     let image_height:i32 = f64::floor(camera.image_width as f64 / camera.aspect_ratio as f64) as i32;
