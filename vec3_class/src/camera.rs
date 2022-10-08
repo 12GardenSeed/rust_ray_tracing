@@ -39,6 +39,6 @@ impl Camera {
     }
 
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
-        Ray::new(&self.origin, &(self.left_lower_corner.clone() + self.horizontal.clone() * u + self.vertical.clone() * v - self.origin.clone()))
+        Ray::new(self.origin.clone(), (self.left_lower_corner.clone() + self.horizontal.clone() * u + self.vertical.clone() * v - self.origin.clone()))
     }
 }

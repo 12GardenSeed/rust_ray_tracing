@@ -14,6 +14,7 @@ pub trait GameObjectTrait:Hitable {
     fn is_in_object(&self, p: &Point3) -> bool;
     fn distance(&self, p: &Point3) -> f64;
     fn bind_material(&mut self, material: Rc<dyn Material>);
+    fn get_bind_material(&self) -> &Option<Rc<dyn Material>>;
 }
 
 pub struct GameObject {
@@ -62,6 +63,7 @@ impl Hitable for Sphere {
         hit_record.t = Some(res);
         hit_record.point = Some(p);
         hit_record.normal = Some(normal);
+        hit_record.material = self.material.to_owned();
         delta
     }
 }
@@ -82,5 +84,9 @@ impl GameObjectTrait for Sphere {
 
     fn bind_material(&mut self, material:Rc<dyn Material>) {
         self.material = Some(material)
+    }
+
+    fn get_bind_material(&self) -> &Option<Rc<dyn Material>> {
+        &self.material
     }
 }

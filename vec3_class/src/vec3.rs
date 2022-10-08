@@ -1,5 +1,6 @@
 use std::{fs, env};
-use crate::utility::utility;
+use crate::utility::Utility;
+const NZ:f64 = 1e-8; 
 #[derive(Clone, Debug)]
 pub struct Vec3H {
     values:Vec<f64>,
@@ -41,6 +42,18 @@ impl Vec3H {
     #[inline]
     pub fn unit_vec3(&self) -> Vec3H {
         self.clone() / self.length()
+    }
+
+    #[inline]
+    pub fn near_zero(&self) -> bool {
+        self.x() < NZ && self.y() < NZ && self.z() < NZ
+    }
+
+    #[inline]
+    pub fn copy_other(&mut self, other: &Vec3H) {
+        self[0] = other[0];
+        self[1] = other[1];
+        self[2] = other[2];
     }
 }
 
@@ -168,7 +181,7 @@ pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
 
 #[inline]
 pub fn random() -> Vec3H {
-    Vec3H::new(utility::get_random_range_f64(-1.0, 1.0), utility::get_random_range_f64(-1.0, 1.0), utility::get_random_range_f64(-1.0, 1.0))
+    Vec3H::new(Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0))
 }
 
 pub fn random_in_unit_sphere() -> Vec3H {

@@ -9,15 +9,15 @@ use game_objects::{GameObject, GameObjectTrait, Sphere};
 use hitable::HitRecord;
 use vec3::{Color, Point3, Vec3H, write_color, dot, random_in_unit_sphere};
 use std::{env, fs, rc::Rc};
-// use crate::utility::utility;
+use utility::Utility;
 use ray::Ray;
 
 use crate::camera::Camera;
 // use std::io;
 static FILE_NAME:&str = "ray.ppm";
 static RADIUS_PIEXL: usize = 1;
-static SAMPLING_COUNT: usize = 99;
-static MAX_DEPTH:usize = 50;
+static SAMPLING_COUNT: usize = 10;
+static MAX_DEPTH:usize = 15;
 
 fn clamp(x: f64, min: f64, max: f64) -> f64 {
     assert!(min < max);
@@ -37,7 +37,7 @@ fn unit_random_sphere() -> Vec3H {
     random_in_unit_sphere().unit_vec3()
 }
 
-fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> Color {
+pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> Color {
     if depth == 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
@@ -51,7 +51,7 @@ fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> 
         if t > 0.0 {
             let target = hit_point.clone() + normal.clone() + unit_random_sphere();
             assert!(!v.is_in_object(&target));
-            return ray_color(&Ray::new(&hit_point, &(target.clone() - hit_point.clone())), objects, depth - 1) * 0.5;
+            return ray_color(&Ray::new(hit_point.clone(), target.clone() - hit_point.clone()), objects, depth - 1) * 0.5;
         }
         i += 1;
     }
@@ -59,9 +59,10 @@ fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> 
     let t = (unit.y() + 1.0) * 0.5;
     Color::new(1.0, 1.0, 1.0) *  (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
+
 fn main() {
     //  World
-    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,400, 1.0);
+    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,1000, 1.0);
     let mut objects = Vec::<Rc<dyn GameObjectTrait>>::new();
     objects.push(
         Rc::new(
@@ -114,10 +115,10 @@ fn main() {
             let mut sum_vec = Vec3H::new(0.0, 0.0, 0.0);
             for t in 0..SAMPLING_COUNT {
                 let j = image_height as usize - j- 1;
-                let add_x = t % 3;
-                let add_y = (t / 3) % 3; 
-                let rand_x = add_x + i;//(Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + i;
-                let rand_y = add_y + j;//(Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + j;
+                // let add_x = t % 3;
+                // let add_y = (t / 3) % 3; 
+                let rand_x = (Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + i;
+                let rand_y = (Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + j;
                 let u = clamp_i32(rand_x as i32, 0 , camera.image_width - 1) as f64 / (camera.image_width - 1) as f64;
                 let v = clamp_i32(rand_y as i32, 0 , image_height - 1) as f64 / (image_height - 1) as f64;
                 let ray = camera.get_ray(u, v);
