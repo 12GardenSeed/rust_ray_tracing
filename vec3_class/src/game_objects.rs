@@ -57,21 +57,22 @@ impl Hitable for Sphere {
         }
         let p = ray.at(res);
         let normal = (p.clone() - self.center.clone()).unit_vec3();
-        // if dot( &normal, &ray.direction) > 0.0  {
-        //     normal = normal * -1.0
-        // }
         hit_record.t = Some(res);
         hit_record.point = Some(p);
         hit_record.normal = Some(normal);
-        hit_record.material = self.material.to_owned();
+        hit_record.material = self.material.clone();
         delta
     }
 }
 
 impl GameObjectTrait for Sphere {
     fn is_in_object(&self, p: &Point3) -> bool {
-        let v = p.clone() - self.center.clone();
-        v.length() < self.radius
+        if self.distance(p) < 0f64 {
+            println!("error inside go d {} r {} ", self.distance(p), self.radius);
+        }
+        self.distance(p) < 0f64
+        // let v = p.clone() - self.center.clone();
+        // v.length() < self.radius
     }
     fn distance(&self, p: &Point3) -> f64 {
         let v = p.clone() - self.center.clone();

@@ -55,6 +55,11 @@ impl Vec3H {
         self[1] = other[1];
         self[2] = other[2];
     }
+
+    #[inline]
+    pub fn default() -> Self {
+        Self::new(0f64, 0f64, 0f64)
+    }
 }
 
 impl std::ops::Add<Vec3H> for Vec3H {
@@ -125,6 +130,20 @@ impl std::ops::Mul<f64> for Vec3H {
                 self.x() * _rsh,
                 self.y() * _rsh,
                 self.z() * _rsh,
+            ]
+        }
+    }
+}
+
+impl std::ops::Mul<Vec3H> for Vec3H {
+    type Output = Vec3H;
+    #[inline]
+    fn mul(self, _rsh: Vec3H) -> Self::Output {
+        Vec3H{
+            values:vec![
+                self.x() * _rsh.x(),
+                self.y() * _rsh.y(),
+                self.z() * _rsh.z(),
             ]
         }
     }

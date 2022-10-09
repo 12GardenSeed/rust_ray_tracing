@@ -26,4 +26,11 @@ impl Ray {
         self.origin = origin;
         self.direction = direction;
     }
+    pub fn default() -> Self {
+        Ray{
+            origin : Vec3H::default(),
+            direction: Vec3H::default()
+        }
+
+    }
 }
