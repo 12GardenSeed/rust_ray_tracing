@@ -10,7 +10,7 @@ pub struct Camera {
     pub origin: Point3,
     pub aspect_ratio: f32,
     pub view_length: f64,
-    pub image_width: i32,
+    pub screen_width: i32,
     pub distance: f64,
     pub horizontal: Vec3H,
     pub vertical: Vec3H,
@@ -18,15 +18,15 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(origin: Point3, aspect_ratio: f32, view_length: f64, image_width: i32, distance: f64) -> Camera {
+    pub fn new(origin: Point3, aspect_ratio: f32, view_length: f64, screen_width: i32, distance: f64) -> Camera {
         let horizontal =   Vec3H::new(view_length * aspect_ratio as f64, 0.0, 0.0);
         let vertical = Vec3H::new(0.0, view_length, 0.0);
-        let left_lower_corner = origin.clone() - horizontal.clone() * 0.5 - vertical.clone() * 0.5 - Point3::new(0.0, 0.0, distance);
+        let left_lower_corner = origin - horizontal * 0.5 - vertical * 0.5 - Point3::new(0.0, 0.0, distance);
         Camera {
             origin,
             aspect_ratio,
             view_length,
-            image_width,
+            screen_width,
             distance,
             horizontal,
             vertical,
@@ -39,6 +39,6 @@ impl Camera {
     }
 
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
-        Ray::new(self.origin.clone(), (self.left_lower_corner.clone() + self.horizontal.clone() * u + self.vertical.clone() * v - self.origin.clone()))
+        Ray::new(&self.origin, &(self.left_lower_corner + self.horizontal * u + self.vertical * v - self.origin))
     }
 }

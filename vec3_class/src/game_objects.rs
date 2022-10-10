@@ -48,15 +48,15 @@ impl Sphere {
 impl Hitable for Sphere {
     fn hit(&self, hit_record:&mut HitRecord, ray: &crate::ray::Ray, t_min: f64, t_max: f64) -> f64 {
         let a = dot(&ray.direction, &ray.direction);
-        let half_b = dot(&ray.direction, &(ray.origin.clone() - self.center.clone()));
-        let c = dot(&(ray.origin.clone() - self.center.clone()), &(ray.origin.clone() - self.center.clone())) - self.radius * self.radius;
+        let half_b = dot(&ray.direction, &(ray.origin - self.center));
+        let c = dot(&(ray.origin - self.center), &(ray.origin - self.center)) - self.radius * self.radius;
         let delta = half_b * half_b - a * c;
         let res =  (- half_b - delta.sqrt()) / a; 
         if delta < 0.0 || res < t_min || res > t_max {
             return -1.0
         }
         let p = ray.at(res);
-        let normal = (p.clone() - self.center.clone()).unit_vec3();
+        let normal = (p - self.center).unit_vec3();
         hit_record.t = Some(res);
         hit_record.point = Some(p);
         hit_record.normal = Some(normal);
@@ -71,11 +71,9 @@ impl GameObjectTrait for Sphere {
             println!("error inside go d {} r {} ", self.distance(p), self.radius);
         }
         self.distance(p) < 0f64
-        // let v = p.clone() - self.center.clone();
-        // v.length() < self.radius
     }
     fn distance(&self, p: &Point3) -> f64 {
-        let v = p.clone() - self.center.clone();
+        let v = *p - self.center;
         v.length() - self.radius
     }
 

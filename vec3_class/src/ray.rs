@@ -11,7 +11,7 @@ pub struct Ray {
 
 
 impl Ray {
-    pub fn new(origin: Vec3H, direction: Vec3H) -> Ray {
+    pub fn new(origin: &Vec3H, direction: &Vec3H) -> Ray {
         Ray{
             origin :origin.clone(),
             direction: direction.clone()
@@ -19,13 +19,14 @@ impl Ray {
     }
 
     pub fn at(&self, t: f64) -> Vec3H {
-        self.origin.clone() + self.direction.clone() * t
+        self.origin + self.direction * t
     }
 
-    pub fn change(&mut self, origin: Vec3H, direction: Vec3H) {
-        self.origin = origin;
-        self.direction = direction;
+    pub fn change(&mut self, origin: &Vec3H, direction: &Vec3H) {
+        self.origin.copy_other(origin);
+        self.direction.copy_other(direction);
     }
+
     pub fn default() -> Self {
         Ray{
             origin : Vec3H::default(),
