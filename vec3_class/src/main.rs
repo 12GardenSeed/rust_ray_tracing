@@ -96,8 +96,8 @@ fn main() {
         Rc::new(
             Sphere::new(Point3::new(0.0, -100.5, - camera.distance), 100.0, Some(material_ground))
         )
-    )
-    ;objects.push(
+    );
+    objects.push(
         Rc::new(
             Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, Some(material_center))
         )
