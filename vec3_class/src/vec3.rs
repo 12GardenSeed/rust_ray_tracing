@@ -92,9 +92,9 @@ impl std::ops::Sub<Vec3H> for Vec3H {
 impl std::ops::AddAssign for Vec3H {
     #[inline]
     fn add_assign(&mut self, _rhs: Vec3H) {
-        self[0] = self.x() + _rhs.x();
-        self[1] = self.y() + _rhs.y();
-        self[2] = self.z() + _rhs.z();
+        self[0] = self[0] + _rhs[1];
+        self[1] = self[1] + _rhs[1];
+        self[2] = self[2] + _rhs[2];
     }
 }
 
@@ -199,7 +199,11 @@ pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
 
 #[inline]
 pub fn random() -> Vec3H {
-    Vec3H::new(Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0), Utility::get_random_range_f64(-1.0, 1.0))
+    Vec3H::new(
+        Utility::get_random_range_f64(-1.0, 1.0),
+        Utility::get_random_range_f64(-1.0, 1.0), 
+        Utility::get_random_range_f64(-1.0, 1.0)
+    )
 }
 
 pub fn random_in_unit_sphere() -> Vec3H {

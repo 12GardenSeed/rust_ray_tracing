@@ -1,11 +1,5 @@
 use crate::{ray::Ray, vec3::{Point3, Vec3H}};
 
-
-// static IMAGE_WIDTH:i32 = 256i32;
-// static ASPECT_RATIO:f64 = 16.0 / 9.0;
-// static FILE_NAME:&str = "ray.ppm";
-// static VIEW_LENGTH:f64 = 2.0;
-// static DISTANCE:f64 = 1.0;
 pub struct Camera {
     pub origin: Point3,
     pub aspect_ratio: f32,

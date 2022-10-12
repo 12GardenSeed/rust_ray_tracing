@@ -11,12 +11,12 @@ use vec3::{Color, Point3, Vec3H, write_color, dot, random_in_unit_sphere};
 use std::{env, fs, rc::Rc};
 use utility::Utility;
 use ray::Ray;
-use material::{DiffuseMaterial, SmoothMaterial};
+use material::{DiffuseMaterial, SmoothMaterial, FuzzyMetal};
 
 use crate::camera::Camera;
 // use std::io;
 static FILE_NAME:&str = "ray.ppm";
-static RADIUS_PIEXL: usize = 2;
+static RADIUS_PIEXL: usize = 1;
 static SAMPLING_COUNT: usize = 100;
 static MAX_DEPTH:usize = 50;
 
@@ -42,22 +42,20 @@ pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize)
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
-    let mut min_d = f64::MAX;
+    let mut min_t = f64::MAX;
     let mut min_index = 0;
     for i in  0..objects.len() {
         let game_obj = objects[i].as_ref();
-        let d = game_obj.distance(&ray.origin);
         let mut hit_record = HitRecord::new_default();
-        let t = game_obj.hit(&mut hit_record, &ray, 0.001, 99999.0);
-        if t > 0f64 {
-            if min_d < f64::MAX {
-                // println!("{}  comp {}, d {} {}", objects[min_index].as_ref().get_bind_material().as_ref().unwrap().as_ref(), game_obj.get_bind_material().as_ref().unwrap().as_ref(), min_d, d);
+        game_obj.hit(&mut hit_record, &ray, 0.001, 99999.0);
+        if let Some(t) = hit_record.t {
+            if min_t > t {
+                min_t = t;
+                min_index = i;
             }
-            min_index = i;
-            min_d = d
         }
     }
-    if min_d < f64::MAX {
+    if min_t < f64::MAX {
         let game_obj = objects[min_index].as_ref();
         let mut hit_record = HitRecord::new_default();
         let t = game_obj.hit(&mut hit_record, &ray, 0.001, 99999.0);
@@ -70,7 +68,7 @@ pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize)
             let mut attenuation = Color::default();
             if let Some(material_rc) = game_obj.get_bind_material() {
                 let material = material_rc.as_ref();
-                material.scatter(&mut hit_record, &mut attenuation, &mut target);
+                material.scatter(&ray, &mut hit_record, &mut attenuation, &mut target);
             } else {
                 target.change(&hit_point, &(normal + unit_random_sphere()));
             }
@@ -85,12 +83,13 @@ pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize)
 
 fn main() {
     //  World
-    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,400, 1.0);
+    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,1024, 1.0);
     let mut objects = Vec::<Rc<dyn GameObjectTrait>>::new();
     let material_center = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.7, 0.3, 0.3)));
     let material_left = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.8, 0.8)));
     let material_left2 = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.8, 0.8, 0.8)));
     let material_right = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.6, 0.2)));
+    let material_right2 = Rc::new( FuzzyMetal::new(0.5, Color::new(0.8, 0.6, 0.2)));
     let material_ground = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.8, 0.8, 0.)));
     objects.push(
         Rc::new(
@@ -104,12 +103,12 @@ fn main() {
     );
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(-1.0, -0.0, -0.6), 0.5, Some(material_left))
+            Sphere::new(Point3::new(-1.0, -0.0, -1.0), 0.5, Some(material_left))
         )
     );
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(1.0, 0.0, -0.6), 0.5, Some(material_right))
+            Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, Some(material_right2))
         )
     );
     let image_height:i32 = f64::floor(camera.screen_width as f64 / camera.aspect_ratio as f64) as i32;
@@ -126,8 +125,8 @@ fn main() {
             let mut sum_vec = Vec3H::default();
             for t in 0..SAMPLING_COUNT {
                 let j = image_height as usize - j - 1;
-                let rand_x = (Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + i;
-                let rand_y = (Utility::get_random_range_f64(0.0, 1.0) * (RADIUS_PIEXL * 2 + 1) as f64  - RADIUS_PIEXL as f64).floor() as usize + j;
+                let rand_x = (Utility::get_random_range_f64(-1.0, 1.0) * (RADIUS_PIEXL + 1) as f64).round() as i32  + i as i32;
+                let rand_y = (Utility::get_random_range_f64(-1.0, 1.0) * (RADIUS_PIEXL + 1) as f64).round() as i32  + j as i32;
                 let u = clamp_i32(rand_x as i32, 0 , camera.screen_width - 1) as f64 / (camera.screen_width - 1) as f64;
                 let v = clamp_i32(rand_y as i32, 0 , image_height - 1) as f64 / (image_height - 1) as f64;
                 let ray = camera.get_ray(u, v);
