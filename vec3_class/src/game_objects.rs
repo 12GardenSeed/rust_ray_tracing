@@ -59,7 +59,8 @@ impl Hitable for Sphere {
         let normal = (p - self.center).unit_vec3();
         hit_record.t = Some(res);
         hit_record.point = Some(p);
-        hit_record.normal = Some(normal);
+        // hit_record.normal = Some(normal);
+        hit_record.set_face_normal(ray, &normal);
         hit_record.material = self.material.clone();
         delta
     }

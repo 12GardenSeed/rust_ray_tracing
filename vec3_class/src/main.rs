@@ -6,18 +6,18 @@ mod utility;
 mod camera;
 mod material;
 use game_objects::{GameObject, GameObjectTrait, Sphere};
-use hitable::HitRecord;
+use hitable::{HitRecord, ray_color};
 use vec3::{Color, Point3, Vec3H, write_color, dot, random_in_unit_sphere};
 use std::{env, fs, rc::Rc};
 use utility::Utility;
 use ray::Ray;
-use material::{DiffuseMaterial, SmoothMaterial, FuzzyMetal};
+use material::{DiffuseMaterial, SmoothMaterial, FuzzyMetal, Dielectric};
 
 use crate::camera::Camera;
 // use std::io;
 static FILE_NAME:&str = "ray.ppm";
 static RADIUS_PIEXL: usize = 1;
-static SAMPLING_COUNT: usize = 100;
+static SAMPLING_COUNT: usize = 24;
 static MAX_DEPTH:usize = 50;
 
 fn clamp(x: f64, min: f64, max: f64) -> f64 {
@@ -38,7 +38,7 @@ fn unit_random_sphere() -> Vec3H {
     random_in_unit_sphere().unit_vec3()
 }
 
-pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> Color {
+pub fn ray_color2(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
@@ -83,22 +83,23 @@ pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize)
 
 fn main() {
     //  World
-    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,1024, 1.0);
+    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,400, 1.0);
     let mut objects = Vec::<Rc<dyn GameObjectTrait>>::new();
-    let material_center = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.7, 0.3, 0.3)));
+    let material_center = Rc::new(DiffuseMaterial::new(0.1, Color::new(1.0, 1.0, 1.0)));
     let material_left = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.8, 0.8)));
     let material_left2 = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.8, 0.8, 0.8)));
+    let material_left3 = Rc::new(Dielectric::new(1.5));
     let material_right = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.6, 0.2)));
     let material_right2 = Rc::new( FuzzyMetal::new(0.5, Color::new(0.8, 0.6, 0.2)));
     let material_ground = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.8, 0.8, 0.)));
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(0.0, -100.5, - camera.distance), 100.0, Some(material_ground))
+            Sphere::new(Point3::new(0.0, -100.5, -camera.distance), 100.0, Some(material_ground))
         )
     );
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, Some(material_center))
+            Sphere::new(Point3::new(0.0, 0.1, -1.0), 0.5, Some(material_left2))
         )
     );
     objects.push(
