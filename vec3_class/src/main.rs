@@ -85,7 +85,7 @@ fn main() {
     //  World
     let camera = Camera::new(Point3::new(0.0, 0.0, 0.0),16.0 / 9.0,2.0,400, 1.0);
     let mut objects = Vec::<Rc<dyn GameObjectTrait>>::new();
-    let material_center = Rc::new(DiffuseMaterial::new(0.1, Color::new(1.0, 1.0, 1.0)));
+    let material_center = Rc::new(DiffuseMaterial::new(0.1, Color::new(0.7, 0.3, 0.3)));
     let material_left = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.8, 0.8)));
     let material_left2 = Rc::new(DiffuseMaterial::new(1.0, Color::new(0.8, 0.8, 0.8)));
     let material_left3 = Rc::new(Dielectric::new(1.5));
@@ -99,7 +99,7 @@ fn main() {
     );
     objects.push(
         Rc::new(
-            Sphere::new(Point3::new(0.0, 0.1, -1.0), 0.5, Some(material_left2))
+            Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, Some(material_center))
         )
     );
     objects.push(

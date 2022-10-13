@@ -92,7 +92,7 @@ impl std::ops::Sub<Vec3H> for Vec3H {
 impl std::ops::AddAssign for Vec3H {
     #[inline]
     fn add_assign(&mut self, _rhs: Vec3H) {
-        self[0] = self[0] + _rhs[1];
+        self[0] = self[0] + _rhs[0];
         self[1] = self[1] + _rhs[1];
         self[2] = self[2] + _rhs[2];
     }
