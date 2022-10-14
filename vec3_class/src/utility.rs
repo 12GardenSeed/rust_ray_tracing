@@ -20,4 +20,19 @@ pub mod Utility {
         let mut rng = rand::thread_rng();
         rng.gen_range(min, max)
     }
+
+    
+    pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
+        assert!(min < max);
+        if x < min { return min }
+        else if x > max { return max }
+        x
+    }
+
+    pub fn clamp_i32(x: i32, min: i32, max: i32) -> usize {
+        assert!(min < max && min >= 0);
+        if x < min { return min  as usize}
+        else if x > max { return max as usize} 
+        x as usize
+    }
 }
