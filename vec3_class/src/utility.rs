@@ -35,4 +35,10 @@ pub mod Utility {
         else if x > max { return max as usize} 
         x as usize
     }
+    pub fn clamp_f64(x: f64, min: f64, max: f64) -> f64 {
+        assert!(min < max && min >= 0.0);
+        if x < min { return min  as f64}
+        else if x > max { return max as f64} 
+        x as f64
+    }
 }

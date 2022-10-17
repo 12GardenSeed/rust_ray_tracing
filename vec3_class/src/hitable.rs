@@ -93,5 +93,6 @@ pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize)
     }
     let unit = ray.direction.unit_vec3();
     let t = (unit.y() + 1.0) * 0.5;
+    // Color::new(1.0, 1.0, 1.0)
     Color::new(1.0, 1.0, 1.0) *  (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
