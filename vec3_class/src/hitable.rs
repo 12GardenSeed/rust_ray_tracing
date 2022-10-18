@@ -68,6 +68,9 @@ pub fn ray_color(ray:&Ray, objects:&Vec::<Rc<dyn GameObjectTrait>>, depth:usize)
                 min_t = t;
                 min_index = i;
             }
+            if t > 0. {
+                break
+            }
         }
     }
     if min_t < f64::MAX {

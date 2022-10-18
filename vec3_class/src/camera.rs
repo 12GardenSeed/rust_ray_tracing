@@ -1,4 +1,4 @@
-use crate::{ray::Ray, vec3::{Point3, Vec3H, cross}, utility::Utility::degrees_to_radians};
+use crate::{ray::Ray, vec3::{Point3, Vec3H, cross, dot}, utility::Utility::degrees_to_radians};
 
 pub struct Camera {
     pub origin: Point3,
@@ -16,8 +16,8 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(origin: Point3,lookat:Point3, vup: Vec3H, fov:f64, aspect_ratio: f32, view_length: f64, screen_width: i32, distance: f64) -> Camera {
-        let theta = degrees_to_radians(fov);
-        let h = theta.tan();
+        // let theta = degrees_to_radians(fov);
+        // let h = theta.tan();
         let horizontal =   Vec3H::new(view_length * aspect_ratio as f64, 0.0, 0.0);
         let vertical = Vec3H::new(0.0, view_length, 0.0);
         let left_lower_corner = origin - horizontal * 0.5 - vertical * 0.5 - Point3::new(0.0, 0.0, distance);
@@ -43,11 +43,15 @@ impl Camera {
         let view_length = viewport_height;
         let viewport_width = viewport_height * aspect_ratio as f64;
         let w = (origin - lookat).unit_vec3();
-        let u = cross(&vup, &w);
-        let v = cross(&u, &w);
-        let screen_width = 400;
-        let horizontal = v * viewport_width;
-        let vertical = u * viewport_height;
+        let u = cross(&vup, &w).unit_vec3();
+        let mut v = cross(&u, &w);
+        if dot(&v, &vup) < 0. {
+            v = v * -1.
+        }
+        println!("wuv: {} {} {} \nu * v {}",w, u, v, dot(&u, &v));
+        let screen_width = 1024;
+        let horizontal = u * viewport_width;
+        let vertical = v * viewport_height;
         let left_lower_corner = origin - horizontal * 0.5 - vertical * 0.5 - w;
         Camera {
             origin,

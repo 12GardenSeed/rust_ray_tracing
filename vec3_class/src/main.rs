@@ -17,14 +17,14 @@ use crate::camera::Camera;
 // use std::io;
 static FILE_NAME:&str = "final.ppm";
 // static RADIUS_PIEXL: usize = 2;
-static SAMPLING_COUNT: usize = 20;
+static SAMPLING_COUNT: usize = 40;
 static MAX_DEPTH:usize = 50;
 
 fn main() {
     //  World
     // let camera = Camera::new(Point3::new(0., 0., 0.),Point3::new(0., 0., -1.), 16. / 9.,2.,400, 1.);
     // let camera = Camera::new_fov(Point3::new(-2., 2., 1.), Point3::new(0., 0., -1.), Point3::new(0., 1., 0.), 90., 16. / 9.);
-    let camera = Camera::new_fov(Point3::new(12., 2., 3.), Point3::new(0., 0., -0.), Point3::new(0.1, -1.2, 0.), 20., 16. / 9.);
+    let camera = Camera::new_fov(Point3::new(12., 6., 3.), Point3::new(0., 0., 0.), Point3::new(0., 1., 0.), 30., 2.);
     let mut objects = Vec::<Rc<dyn GameObjectTrait>>::new();
     // let material_center = Rc::new(DiffuseMaterial::new(0.1, Color::new(0.1, 0.2, 0.5)));
     // let material_left = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.8, 0.8)));
@@ -32,49 +32,6 @@ fn main() {
     // let material_left3 = Rc::new(Dielectric::new(8.));
     // let material_right = Rc::new(SmoothMaterial::new(Color::new(0.8, 0.6, 0.2)));
     // let material_right2 = Rc::new( FuzzyMetal::new(0.5, Color::new(0.8, 0.6, 0.2)));
-    let material_ground = Rc::new(DiffuseMaterial::new(1., Color::new(0.8, 0.8, 0.8)));
-    objects.push(
-        Rc::new(
-            Sphere::new(Point3::new(0., -1000., -camera.distance), 1000., Some(material_ground))
-        )
-    );
-    // for i in -11..11 {
-    //     for j in -11..11 {
-    //         let choose_material = Utility::get_random_range_f64(0., 1.);
-    //         let center = Point3::new(i as f64 + Utility::get_random_range_f64(-1., 1.) * 0.9, 0.2, j as f64 + Utility::get_random_range_f64(-1., 1.) * 0.9);
-    //         if (center - Point3::new(4., 0.2, 0.)).length() > 0.9 {
-    //             match choose_material {
-    //                 x if x < 0.8 => {
-    //                     let color = random_vec3() * random_vec3();
-    //                     let material = Rc::new(DiffuseMaterial::new(Utility::get_random_range_f64(0., 1.), color));
-    //                     objects.push(
-    //                         Rc::new(
-    //                             Sphere::new(center, 0.2, Some(material))
-    //                         )
-    //                     );
-    //                 },
-    //                 x if x < 0.95 => {
-    //                     let color = random_vec3() * random_vec3();
-    //                     let material = Rc::new(FuzzyMetal::new(Utility::get_random_range_f64(0., 1.), color));
-    //                     objects.push(
-    //                         Rc::new(
-    //                             Sphere::new(center, 0.2, Some(material))
-    //                         )
-    //                     );
-    //                 }
-    //                 _ => {
-    //                     let color = random_vec3() * random_vec3();
-    //                     let material = Rc::new(Dielectric::new(Utility::get_random_range_f64(0., 10.)));
-    //                     objects.push(
-    //                         Rc::new(
-    //                             Sphere::new(center, 0.2, Some(material))
-    //                         )
-    //                     );
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
     let material1 = Rc::new(Dielectric::new(8.0));
     objects.push(
         Rc::new(
@@ -91,6 +48,49 @@ fn main() {
     objects.push(
         Rc::new(
             Sphere::new(Point3::new(4., 1., 0.), 1., Some(material3))
+        )
+    );
+    for i in -11..11 {
+        for j in -11..11 {
+            let choose_material = Utility::get_random_range_f64(0., 1.);
+            let center = Point3::new(i as f64 + Utility::get_random_range_f64(-1., 1.) * 0.9, 0.2, j as f64 + Utility::get_random_range_f64(-1., 1.) * 0.9);
+            if (center - Point3::new(4., 0.2, 0.)).length() > 0.9 {
+                match choose_material {
+                    x if x < 0.8 => {
+                        let color = random_vec3() * random_vec3();
+                        let material = Rc::new(DiffuseMaterial::new(Utility::get_random_range_f64(0., 1.), color));
+                        objects.push(
+                            Rc::new(
+                                Sphere::new(center, 0.2, Some(material))
+                            )
+                        );
+                    },
+                    x if x < 0.95 => {
+                        let color = random_vec3() * random_vec3();
+                        let material = Rc::new(FuzzyMetal::new(Utility::get_random_range_f64(0., 1.), color));
+                        objects.push(
+                            Rc::new(
+                                Sphere::new(center, 0.2, Some(material))
+                            )
+                        );
+                    }
+                    _ => {
+                        let color = random_vec3() * random_vec3();
+                        let material = Rc::new(Dielectric::new(Utility::get_random_range_f64(0., 10.)));
+                        objects.push(
+                            Rc::new(
+                                Sphere::new(center, 0.2, Some(material))
+                            )
+                        );
+                    }
+                }
+            }
+        }
+    }
+    let material_ground = Rc::new(DiffuseMaterial::new(1., Color::new(0.8, 0.8, 0.8)));
+    objects.push(
+        Rc::new(
+            Sphere::new(Point3::new(0., -1000., -camera.distance), 1000., Some(material_ground))
         )
     );
 

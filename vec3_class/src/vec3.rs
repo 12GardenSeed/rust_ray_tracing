@@ -181,15 +181,15 @@ impl std::ops::DivAssign<f64> for Vec3H {
 impl std::fmt::Display for Vec3H {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} {}", self[0], self[1], self[2])
+        write!(f, "Vec3H: {} {} {}", self[0], self[1], self[2])
     }
 }
 
 pub fn cross(u: &Vec3H, v: &Vec3H) -> Vec3H {
     Vec3H::new(
-        u[1] * v[2] - u[2] - v[1],
-        u[2] * v[0] - u[0] - v[2],
-        u[0] * v[1] - u[1] - v[0]
+        u[1] * v[2] - u[2] * v[1],
+        u[2] * v[0] - u[0] * v[2],
+        u[0] * v[1] - u[1] * v[0]
     )
 }
 
