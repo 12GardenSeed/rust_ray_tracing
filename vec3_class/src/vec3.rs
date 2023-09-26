@@ -1,4 +1,3 @@
-use std::{fs, env};
 use crate::utility::Utility;
 const NZ:f64 = 1e-8; 
 #[derive(Clone, Copy, Debug)]
@@ -185,6 +184,12 @@ impl std::fmt::Display for Vec3H {
     }
 }
 
+impl PartialEq for Vec3H {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
 pub fn cross(u: &Vec3H, v: &Vec3H) -> Vec3H {
     Vec3H::new(
         u[1] * v[2] - u[2] * v[1],
@@ -198,18 +203,19 @@ pub fn dot(u: &Vec3H, v: &Vec3H) -> f64 {
 }
 
 #[inline]
-pub fn random() -> Vec3H {
+pub fn random(min:f64, max: f64) -> Vec3H {
+    assert!(min < max);
     Vec3H::new(
-        Utility::get_random_range_f64(-1.0, 1.0),
-        Utility::get_random_range_f64(-1.0, 1.0), 
-        Utility::get_random_range_f64(-1.0, 1.0)
+        Utility::get_random_range_f64(min, max),
+        Utility::get_random_range_f64(min, max), 
+        Utility::get_random_range_f64(min, max)
     )
 }
 
 pub fn random_in_unit_sphere() -> Vec3H {
     loop {
-        let r = random();
-        if r.length() < 1.0 {
+        let r = random(-1., 1.);
+        if r.length() < 1.0 && !r.near_zero() {
             return r
         }
     }
@@ -230,3 +236,29 @@ pub fn write_color(c: Color) -> String {
 
 pub type Color = Vec3H;
 pub type Point3 = Vec3H;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cross() {
+        assert_eq!(cross(&Vec3H::new(1., 0., 0.), &Vec3H::new(0., 1., 0.)), Vec3H::new(0., 0., 1.));
+    }
+
+    #[test]
+    fn test_dot() {
+        assert_eq!(dot(&Vec3H::new(1., 0., 0.), &Vec3H::new(0., 1., 0.)), 0.);
+        assert_eq!(dot(&Vec3H::new(1., 5., 0.), &Vec3H::new(0., 1., 4.)), 5.);
+    }
+
+    #[test]
+    fn test_random_in_unit_sphere() {
+        for i in 0..100 {
+            let random_vec = random_in_unit_sphere();
+            assert!(!random_vec.near_zero());
+            assert!(random_vec.length() < 1.);
+        }
+    }
+
+}
